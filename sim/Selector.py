@@ -189,6 +189,88 @@ class WaxmanSelector_0(Selector):
             return False
 
 
+class DemoSelector(Selector):
+    def __init__(self):
+        super().__init__()
+        
+
+
+    def analyse(self, DC, sfcInput):
+        topo = copy.deepcopy(DC.topo) #M
+        sfc = copy.deepcopy(sfcInput) #M
+        
+        def placement(bin, package):
+            n_bin = len(bin)
+            n_package = len(package)
+            arg = round(5 / 4 * pow(4 * n_bin, 2/3) + 1)
+            alloc = [-1] * n_package
+            for i in range(n_package):
+                for _ in range(1, 20):
+                    idx = np.random.randint(0, n_bin)
+                    if(bin[idx] > package[i]):
+                        bin[idx] -= package[i]
+                        alloc[i] = idx + arg
+                        break
+                    return 0
+
+            return alloc
+
+        # alloc vnf to server
+        serverCap = []
+        for node in list(topo.nodes.data()):
+            if(node[1]["model"] == "server"):
+                serverCap.append(node[1]["capacity"] - node[1]["usage"])
+        vnfCap = []
+        for vnf in list(sfc["struct"].nodes.data()):
+            vnfCap.append(vnf[1]["demand"])
+            usage = []
+        for node in list(DC.topo.nodes.data()):
+            if(node[1]["model"] == "server"):
+                nei = list(DC.topo.neighbors(node[0]))[0]
+                usage.append(DC.topo[node[0]][nei]['usage'])
+
+        alloc = placement(serverCap, vnfCap)
+
+        if(alloc):
+            for vnf in list(sfc["struct"].nodes.data()):
+                c_server = alloc[vnf[0]] # the choosen server
+                vnf[1]["server"] = c_server
+
+            data = list(sfc["struct"].edges.data())
+
+            demand_bw = []
+            for i in data:
+                demand_bw.append(i[2]['demand'])
+
+            for itr in np.argsort(demand_bw)[::-1]:
+                s = sfc["struct"].nodes[data[itr][0]]["server"]
+                d = sfc["struct"].nodes[data[itr][1]]["server"]
+
+                _topo = copy.deepcopy(topo)
+                
+                v_link = sfc["struct"].edges[data[itr][0], data[itr][1]]
+                for p_link in list(_topo.edges.data()):
+                    if(p_link[2]["capacity"] - p_link[2]['usage'] < v_link["demand"]):
+                        _topo.remove_edge(p_link[0], p_link[1])
+                try:
+                    route = nx.shortest_path(_topo, s, d)
+                    for i in range(len(route) - 1):
+                        topo.edges[route[i], route[i+1]]['usage'] += v_link["demand"]
+                    if len(route) == 1: route = []
+                    sfc["struct"].edges[data[itr][0], data[itr][1]]["route"] = route
+                except:
+                    logging.debug(f"cannot routing from {s} to {d}, bw = {v_link['demand']} ---------")
+                    sfc["struct"].edges[data[itr][0], data[itr][1]]["route"] = []
+                    return 1
+
+            sfc["DataCentre"] = DC.id
+            return copy.deepcopy(sfc)
+        else:
+            logging.debug("cannot alloc")
+            return 2
+        
+
+
 import matplotlib.pyplot as plt
 
 class HRE(Selector):

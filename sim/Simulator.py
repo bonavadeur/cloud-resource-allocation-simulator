@@ -17,7 +17,7 @@ class Simulator():
         self.logger = Logger(self, folder_log, logCSV)
 
         logging.basicConfig(level=logLevel, format="%(message)s")
-        self.strategy = arg[0]
+        self.strategy = arg[0] # 1 is not remap, 2 is remap
 
         if(len(arg) == 2): self.sortmode = arg[1]
 
@@ -25,9 +25,9 @@ class Simulator():
         self.DataCentres = copy.deepcopy(substrate.DCs)
         self.Ingresses = copy.deepcopy(substrate.Ingresses)
 
-        self.selectorLog = []
+        # self.selectorLog = []
 
-        self.capacity = 0
+        self.capacity = 0 # sum of all Server's capacity
         for DC in self.DataCentres:
             for node in list(DC.topo.nodes.data()):
                 if(node[1]["model"] == "server"):
@@ -146,45 +146,6 @@ class Simulator():
                     
 
     def handler(self, sfc, rehandler):
-        # failed = 0
-        # failDetail = []
-        # decision = {"sfc": {}, "outroute": 0}
-
-        # power = 0
-        # step = 100
-        # for DC in self.DataCentres:
-        #     result = DC.consider(self, sfc)
-        #     if(not result in [1, 2]):
-        #         _topo = copy.deepcopy(self.topology)
-        #         _sfc = result["sfc"]
-        #         for out_link in list(_topo.edges.data()):
-        #             if(out_link[2]["capacity"] - out_link[2]["usage"] < _sfc["outlink"]):
-        #                 _topo.remove_edge(out_link[0], out_link[1])
-                
-        #         try:
-        #             route = nx.shortest_path(_topo, _sfc["Ingress"], _sfc["DataCentre"])
-        #         except:
-        #             logging.debug(f"Cannot routing from Ingress-{_sfc['Ingress']} to DC-{DC.id}")
-        #             failed += 1
-        #             continue
-        #         else: # exist route
-        #             # if(power == 0
-        #             #     or (result["deltaPower"] < power)
-        #             #     or (result["deltaPower"] == power and len(route) < step)):
-        #             #     power = result["deltaPower"]
-        #             #     step = len(route)
-        #             #     result["sfc"]["outroute"] = route
-        #             #     deploy = result["sfc"]
-        #             if(len(route) < step):
-        #                 step = len(route)
-        #                 result["sfc"]["outroute"] = route
-        #                 decision = result["sfc"]
-                        
-        #     else: # cannot deploy in current DC
-        #         failDetail.append([DC.id, result])
-        #         logging.debug(f"cannot deploy SFC-{sfc['id']} on DC-{DC.id}")
-        #         failed += 1
-
         failed, failDetail, decision = sfc["app"].subSelector.analyse(self, sfc)
 
         if(failed == len(self.DataCentres)):
@@ -255,5 +216,4 @@ class Simulator():
         logging.info(f"migration: {self.migration} times")
         logging.info(f"Simulator time: {(endTime - startTime) // 60}m{(endTime - startTime) % 60}s")
 
-        # return [accepted, total, acceptance, acceptedVNFs, totalVNFs, acceptanceVNFs, (endTime - startTime)]
         return self.stat
