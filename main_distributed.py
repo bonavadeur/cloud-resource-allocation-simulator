@@ -20,29 +20,35 @@ def main_distributed(randomSeed, appArgs, runtime, argument, DCPos, IngressPos):
     np.random.seed(randomSeed)
     random.seed(randomSeed)
 
+
     # selector = WaxmanSelector()
     # selector = VNFG()
     # selector = ONP_SFO(15)
     # selector = MIX_ver2(30)
     selector = HRE_ver2()
 
+
     subSelector = ShortestPath()
     # subSelector = AlphaSubsel()
     # subSelector = BetaSubsel()
 
+
     # app = SequenceApp(dist, selector, subSelector, *appArgs)
     app = WaxmanApp(dist, selector, subSelector, *appArgs)
-
     apps = [app]
+
+
 
     # origin
     # substrate = Abilene(DCPos=[1, 4, 6, 11], IngressPos=[5, 7, 9, 10], linkCap=100,
     #                     DCArgs=[4, 6, 6, 8], IngressArgs=[apps, apps, apps, apps], n_clusters=0)
 
+
     # best
     # substrate = Abilene(DCPos=[1, 2, 4, 8], IngressPos=[5, 7, 9, 10], linkCap=100,
                         # DCArgs=[4, 6, 6, 8], IngressArgs=[apps, apps, apps, apps], n_clusters=0)
-                        
+
+
     # substrate = Abilene(DCPos=[6, 9, 10, 12], IngressPos=IngressPos, linkCap=100,
     #                     DCArgs=[4, 6, 6, 8], IngressArgs=[apps, apps, apps, apps], n_clusters=0)
     # substrate = Europe(DCPos=[], IngressPos=[5, 7, 9, 10], linkCap=100,
@@ -51,6 +57,7 @@ def main_distributed(randomSeed, appArgs, runtime, argument, DCPos, IngressPos):
     #                     DCArgs=[4, 6, 6, 8], IngressArgs=[apps, apps, apps, apps], n_clusters=4)
     # substrate = France(DCPos=[], IngressPos=[5, 7, 9, 10], linkCap=100,
     #                     DCArgs=[10], IngressArgs=[apps, apps, apps, apps], n_clusters=4)
+
 
     substrate = Abilene(DCPos=DCPos, IngressPos=IngressPos, linkCap=100,
                         DCArgs=[4, 6, 6, 8], IngressArgs=[apps, apps, apps, apps], n_clusters=0)
@@ -110,6 +117,9 @@ if __name__ == "__main__":
     runtime = 200
     appArgs = [avg_TTL, n_VNFs, demand_VNF, bw, [0.5, 0.5]]
 
+    # run one case
+    main_distributed(randomSeed=randomSeed, appArgs=appArgs, runtime=runtime, argument=arg, DCPos=[1, 4, 6, 11], IngressPos=[5, 7, 9, 10])
+
     # brute force
     # # N_NODES = 12 # Abilene
     # # N_NODES = 39 # BigAbilene
@@ -135,6 +145,3 @@ if __name__ == "__main__":
     #     #     ingCount += 1
     #     #     print(f"DC: {dcCount}/{len(DCPos)} ({round(dcCount % BUFFER / BUFFER * 100, )}%), Ingress: {ingCount}/{len(ingressPos)}")
     #     #     main_distributed(randomSeed, appArgs, runtime, arg, list(_dcpos), list(_ingpos))
-
-    # run one case
-    main_distributed(randomSeed, appArgs, runtime, arg, [1, 4, 6, 11], [5, 7, 9, 10])

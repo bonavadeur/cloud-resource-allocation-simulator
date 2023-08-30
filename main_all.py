@@ -21,7 +21,7 @@ def main_distributed(randomSeed, appArgs, runtime, argument, results, index):
     np.random.seed(randomSeed)
     random.seed(randomSeed)
 
-    selector = WaxmanSelector()
+    selector = WaxmanSelector_0()
     # selector = VNFG()
     # selector = ONP_SFO(k_sub = 15)
     app = WaxmanApp(dist, selector, *appArgs)
