@@ -9,7 +9,6 @@ import networkx as nx
 class DataCentre():
     def __init__(self, id, topo):
         self.id = id
-        # self.freeTopo = copy.deepcopy(topo)
         self.topo = topo
 
         self.activeServer = [] # list of id
@@ -23,14 +22,12 @@ class DataCentre():
 
 
     def consider(self, sim, sfc):
-        
         anaRes = sfc["app"].selector.analyse(self, sfc) # analyse result
-        if(not anaRes in [1, 2]):
-            topo = self.install(anaRes)
+        if(not anaRes in [1, 2]): # 1 is not enough bandwidth, 2 is not enough capacity
+            topo = self.fakeDeploy(anaRes)
             power = self.energy(topo)
 
             _util = sum([node[1]["usage"] for node in list(self.topo.nodes.data()) if node[1]["model"] == "server"])
-            # _bwUsage = sum([edge[2]["usage"] for edge in list(self.topo.edges.data())])
             _bwCap = sum([edge[2]["capacity"] - edge[2]["usage"] for edge in list(self.topo.edges.data())])
             weight = _util * _bwCap
             
@@ -42,16 +39,12 @@ class DataCentre():
             }
         else:
             considerRes = anaRes
-            # print(f"DC-{self.id} drop SFC-{sfc['id']}")
         return considerRes
 
 
 
     def deployer(self, sfc, sim, redeploy):
-        # print("deployer")
-        # print([node[1]["usage"] for node in list(self.topo.nodes.data()) if node[1]["model"] == "server"])
-        self.topo = self.install(sfc)
-        # print([node[1]["usage"] for node in list(self.topo.nodes.data()) if node[1]["model"] == "server"])
+        self.topo = self.fakeDeploy(sfc)
         self.power = self.energy(self.topo)
         outroute = sfc["outroute"]
         for i in range(len(outroute) - 1):
@@ -66,7 +59,6 @@ class DataCentre():
 
         sim.util += sfc["demand"]
         
-        # topo = self.topo_status_json()
         if(redeploy):
             sim.logger.log_event(sim, sim.logger.REDEPLOY, SFC=sfc)
         else:
@@ -78,7 +70,6 @@ class DataCentre():
         try:
             start = sim.env.now
             yield sim.env.timeout(sfc["remain"])
-            # sim.VNFs[0] -= len(sfc["struct"].nodes)
             sim.util -= sfc["demand"]
             sfc["remain"] = 0
 
@@ -143,7 +134,7 @@ class DataCentre():
 
 
 
-    def install(self, sfc): # anaRes is sfc after analysing
+    def fakeDeploy(self, sfc): # anaRes is sfc after analysing
         topo = copy.deepcopy(self.topo)
 
         sfcTopo = sfc["struct"]
