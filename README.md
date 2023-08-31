@@ -275,4 +275,6 @@ Ma Việt Đức - maduc238
 Phòng nghiên cứu Mạng máy tính Future Internet Laboratory, Phòng 618 Thư Viện Tạ Quang Bửu, Đại học Bách Khoa Hà Nội  
 未来のインターネット研究室, タコアンビュ図書館の６１８、ハノイ百科大学、ベトナム。
 
-![](img/contributeur.png)
+<<<<<<< HEAD
+![](img/github-wp.png)
+>>>>>>> readme
