@@ -26,7 +26,7 @@ Kịch bản được mô phỏng trên các topo mạng Backbone trong thực t
 
 ![Abilene](img/AbileneTopo.png)
 
-Các node màu xanh lá (IngressNode) là các node tạo yêu cầu, các node màu đỏ là các Trung tâm dữ liệu (DataCentre), các node còn lại đóng vai trò các trạm trung chuyển (Router). Yêu cầu được tạo ra từ các IngressNode là các chuỗi dịch vụ (SFC) gồm các VNF, cần được triển khai tại các DataCentre. Thời gian tạo ra các SFC tại các IngressNode tuân theo phân phối Gauss. Các đường mạng nối giữa các Node có tài nguyên được biểu thị bằng Băng thông tối đa (Bandwidth).
+Các node màu xanh lá (IngressNode) là các node tạo yêu cầu, các node màu đỏ là các Trung tâm dữ liệu (DataCentre), các node còn lại đóng vai trò các trạm trung chuyển (Router). Yêu cầu được tạo ra từ các IngressNode là các chuỗi dịch vụ (SFC) gồm các VNF, cần được triển khai tại các DataCentre. Thời gian tạo ra các SFC tại các IngressNode tuân theo phân phối Poisson. Các đường mạng nối giữa các Node có tài nguyên được biểu thị bằng Băng thông tối đa (Bandwidth).
 
 Mỗi DataCentre có lượng tài nguyên (compute, network) cố định, được tổ chức gồm các Server và Router theo mô hình Fattree. Các Server có tài nguyên được biểu thị bằng Compute (tối đa là 100), các đường mạng nối giữa các SErver và Router có tài nguyên được biểu thị bằng Băng thông tối đa (bandwidth)
 
